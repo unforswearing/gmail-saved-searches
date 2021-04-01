@@ -1,21 +1,28 @@
 /*
+  git: ~/Documents/__Github/gmail-saved-searches
   SavedSearches: Add a hacky way to use labels as saved searches in gmail
   - started: 3/31/2021
 */
 class SavedSearches {
   /*
     from: 3/31 - 4/1
+    @todo DO NOT OVER-ENGINEER THIS!
     @todo save params.label to script properties
-    @todo add a list of saved searches (as strings and objects) to params.label.saved)
+    @todo add a list of saved searches (as strings and objects) to params.label.saved
+      as an object: { name1: { object, string }, name2: { ... }, ... }
     @todo add newly created labels to params.label.saved
     @todo when finding msgs labeled '::create' or '::remove', 
       remove the create/remove label at some point after adding to script props
     @todo need a way to allow 'user' to name the search
+    @todo might need a way to store the labels object outside of the script
+      (if there are a lot of saved searches / user labels to store) - 
+      firebase via firebase library?
   */
   constructor() {
     this._lgmail = GmailApp;
     this.params = { 
       label: {
+        saved: [],
         object: { create: false, remove: false, },
         string: {
           create: 'saved_search::create', remove: 'saved_search::remove', 
@@ -28,7 +35,7 @@ class SavedSearches {
         this._lgmail.createLabel(name);
         this.params[name] = this.params.get_user_label(name);
       },
-    }
+    };
     this.params.label.object.create = (!this.params.find_user_label(this.params.label.string.create)) ? 
       this.params.create_and_add_label(this.params.label.string.create) :
       this.params.find_user_label(this.params.label.string.create);
@@ -52,6 +59,8 @@ class SavedSearches {
       let cleanup = () => {
         delete this._searches.list;
         delete this._searches.filter_saved;
+        delete this._searches.filter_create;
+        delete this._searches.filter_remove;
         delete this._lgmail;
         return collector.filter(Boolean);
       };
