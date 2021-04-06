@@ -56,17 +56,10 @@ class SavedSearches {
         let isSaved = (localItem.match(this.params.saved_search_re));
         collector.push(isSaved ? item : undefined);
       };
-      let cleanup = () => {
-        delete this._searches.list;
-        delete this._searches.filter_saved;
-        delete this._searches.filter_create;
-        delete this._searches.filter_remove;
-        delete this._lgmail;
-        return collector.filter(Boolean);
-      };
-      return { cleanup: cleanup };
+      
+      return collector.filter(Boolean);
     };
-    this._searches['saved_searches'] = this._searches.filter_saved().cleanup();
+    this._searches['saved_searches'] = this._searches.filter_saved()
   };
   _parameters() { return this.params; };
   labels() { return this._searches.saved_searches };
