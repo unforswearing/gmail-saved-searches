@@ -2,7 +2,8 @@
 
   SavedSearches: Add a hacky way to use labels as saved searches in gmail
   - started: 3/31/2021
-  -> possible solution for naming searches: https://www.inboxsdk.com/
+    - saving searches: currently using a spreadsheet for configuration
+    -> possible solution for naming searches: https://www.inboxsdk.com/
 
 */
 class SavedSearches {
@@ -118,15 +119,6 @@ class SavedSearches {
   findRemove() { return this._searches.remove_search };
 };
 
-function manageSavedSearches() {
-
-
-  /*
-    manage labels in this function - use on trigger, 
-    exec the find / add / remove / etc funcs
-  */
-
-}
 
 
 
