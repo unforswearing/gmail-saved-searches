@@ -27,37 +27,16 @@
 
 */
 
-const search_util = {
-  create_save_label: () => {
-    return GmailApp.createLabel('save-search')
-  },
-  create_delete_label: () => {
-    return GmailApp.createLabel('delete-search')
-  },
-  retrieve_labels: () => {
+const saveLabel = GmailApp.getUserLabels().find((label) => label.getName() === 'save-search')
+const delLabel = GmailApp.getUserLabels().find((label) => label.getName() === 'delete-search')
 
-  },
-}
-
-search_util['retrieve_labels'] = () => {
-  let save = GmailApp.getUserLabelByName('save-search') || 
-    search_util.create_delete_label;
-
-  let del = GmailApp.getUserLabelByName('delete-search') ||
-    search_util.create_delete_label;
-
-  return {save, del}
-}
-
-const config = globalThis.config
-
-const retrieveSavedSearches = () => config.retrieveSearches();
-const saveSearch = () =>  config.addNewSearch();
+const retrieveSearches = () => Config.retrieveSearches();
+const saveSearch = () =>  Config.addNewSearch();
 
 // this function only removes searches by gmail label
 // searches can also be removed by deleting the item in config sheet
 // see config.gs
-const removeSearch = () => config.removeSearch();
+const removeSearch = () => Config.removeSearch();
 
 // currently searches can only be renamed in the config sheet 
 // or by manually editing the gmail label name.
@@ -65,7 +44,7 @@ const removeSearch = () => config.removeSearch();
 // see config for names updated in the sheet (uses onEdit trigger)
 // search for saved item, check if the name is the same as default 
 // listed in config, if not, update config. 
-const renameSearch = () => config.renameSearch();
+const renameSearch = () => Config.renameSearch();
 
 
 

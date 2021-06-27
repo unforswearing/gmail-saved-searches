@@ -1,5 +1,16 @@
 // function createConfigSheet() {}
 
+// logging create_save_label alone will return an empty object
+// use a label method (eg. getName()) to use the return value
+const search_util = {
+  create_save_label: () => {
+    return GmailApp.createLabel('save-search')
+  },
+  create_delete_label: () => {
+    return GmailApp.createLabel('delete-search')
+  }
+}
+
 /** @type {string} */
 globalThis.configSheetId = '1qVGGOCsHX9lhQcQ8-0VhpT2kf6l-2eNhDWEaGL4VICM'
 
@@ -38,24 +49,22 @@ const config_util = () => {
       ];
 
       return info
-    }
+    }, config_sheet: {
+      // columnHeader: ["datetime", "messageIds", "search", "title"],
+      // @todo fix this
+      lastRange: () => {
+        'A1:' + globalThis.spreadsheet.getLastRow() + globalThis.spreadsheet.getLastCol()
+      },
+    } 
   }
   return config_params
-};
-
-/** @type {object} */
-const configSheetParameters = {
-  // columnHeader: ["datetime", "messageIds", "search", "title"],
-  // @todo fix this
-  lastRange: () => {
-    'A1:' + globalThis.spreadsheet.getLastRow() + globalThis.spreadsheet.getLastCol()
-  },
 };
 
 /** @return {Array} */
 function retrieveSavedSearches() {
   let sheet = globalThis.spreadsheet
-  const configData = sheet.getRange(configSheetParameters).getValues();
+  let lastRange = config_util().config_sheet.lastRange()
+  const configData = sheet.getRange(lastRange).getValues();
   return configData
 }
 
@@ -74,7 +83,7 @@ function addNewSavedSearch(searchInfoObject) {
   }
 
   if (!newSavedSearches) return;
-  // generate info object, create default name,  expect(1).toBe(2)
+  // generate info object, create default name, etc
 
   /*
     { 
@@ -121,24 +130,42 @@ function renameSavedSearch(searchInfoObject) {
   // for names changed by manually updating the label, see savedSearches.gs
 }
 
-// @todo finish this once the basic functions work (add/delete searches)
 /**
  * @argument {object} searchInfoObject
  * @return {object}
  */
 function removeSavedSearch(searchInfoObject) {
-  // this function only removes searches from
+  // this function only acts on searches removed from the spreadsheet
 }
 
-class Config {
-  constructor() {
-    sheetId = globalThis.configSheetId
-    sheet = globalThis.spreadsheet
-    retrieveSearches = retrieveSavedSearches
-    addNewSearch = addNewSavedSearch
-    renameSearch = renameSavedSearch
-    removeSearch = removeSavedSearch
-  }
+Config = {
+  sheetId: globalThis.configSheetId,
+  sheet: globalThis.spreadsheet,
+  retrieveSearches: retrieveSavedSearches,
+  addNewSearch: addNewSavedSearch,
+  renameSearch: renameSavedSearch,
+  removeSearch: removeSavedSearch,
 }
 
-globalThis.config = new Config();
+globalThis.config = Config;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
