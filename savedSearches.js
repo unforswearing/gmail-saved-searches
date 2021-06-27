@@ -70,6 +70,7 @@ function renameSearch() {
   // see config for names updated in the sheet (uses onEdit trigger)
   // search for saved item, check if the name is the same as default 
   // listed in config, if not, update config. 
+  
 }
 
 
