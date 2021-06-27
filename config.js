@@ -1,63 +1,68 @@
 // function createConfigSheet() {}
-import { join } from "path";
-import { Low, JSONFile } from "lowdb";
-import { SHARE_ENV } from "worker_threads";
-import { Script } from "vm";
 
+/** @type {string} */
 globalThis.configSheetId = '1qVGGOCsHX9lhQcQ8-0VhpT2kf6l-2eNhDWEaGL4VICM'
+
+/** @type {object} */
 globalThis.spreadsheet = SpreadsheetApp.openById(globalThis.configSheetId)
 
+// 'store' uses script properties to store the saved search info
+/**
+ * @return {object}
+ */
 const store = () => {
-  /** @type {string} */
-  const dbPath = (__dirname, "db.json");
-
-  let dbFile = new JSONFile(dbPath);
-  let database = new Low(dbFile);
-
-  await database.read();
-
-  /** @type {Object} */
-  database.data ||= {};
+  /** @type {object} */
+  const props = PropertiesService().getScriptProperties();
 
   return {
-    read: database.read,
-    write: database.write,
-    data: database.data,
+    read: (key) => props.getProperty(key),
+    write: (key, value) => props.setProperty(key, value),
   };
 };
 
-const configSheetParameters = {
-  columnHeader: ["datetime", "messageIds", "search", "title"],
-  lastRange: globalThis.spreadsheet.getLastRow() + globalThis.spreadsheet.getLastCol(), 
-
-}
-
 /** @return {Object} */
-const config_util = {
-  loadConfigSheet: (globalThis) => {},
-  generate_search_info_obj: (savedSearchDataRange) => {
+const config_util = () => {
+  let config_params = {
+    /**
+     * @argument {object} infoObject
+     * @return {Array}
+     */
+    format_search_info_for_sheet: (infoObject) => {
+      let info = [
+        [
+          infoObject.datetime,
+          infoObject.messageIds,
+          "search terms",
+          infoObject.datetime,
+        ],
+      ];
 
-  },
-  format_search_info_for_sheet: (infoObject) => {
-    let container = [];
-    let info = [
-      infoObject.datetime,
-      infoObject.messageIds,
-      "search terms",
-      infoObject.datetime,
-    ];
-    /** @type {Array} */
-    return container[info];
-  },
-  store_searches_in_properties: (infoObject) => {
-    let formattedObject = store().write(infoObject)
-    PropertiesService().getScriptProperties().setProperty(infoObject.datetime, formattedObject)
-  },
+      return info
+    }
+  }
+  return config_params
 };
 
 /** @type {object} */
-const searchConfigObject = config_util.generate_messge_config_obj();
+const configSheetParameters = {
+  // columnHeader: ["datetime", "messageIds", "search", "title"],
+  // @todo fix this
+  lastRange: () => {
+    'A1:' + globalThis.spreadsheet.getLastRow() + globalThis.spreadsheet.getLastCol()
+  },
+};
 
+/** @return {Array} */
+function retrieveSavedSearches() {
+  let sheet = globalThis.spreadsheet
+  const configData = sheet.getRange(configSheetParameters).getValues();
+  return configData
+}
+
+/**
+ * @argument {object} searchInfoObject
+ * @return {void}
+ */
 function addNewSavedSearch(searchInfoObject) {
   // use ..format_mesage_info_for_sheet to help format info
   // for configuration sheet
@@ -80,47 +85,59 @@ function addNewSavedSearch(searchInfoObject) {
   }
   */
 
-  const now = `saved-search:${new Date().getTime()}`
+  /** @type {Date} */
+  const now = new Date().getTime();
 
-  let container = {}
+  /** @type {string} */
+  const datetime = `saved-search:${now}`;
+
+  let container = {};
 
   let tmpObj = {
     /** @type {Date} */
-    datetime: undefined,
+    datetime: now,
     /** @type {string} */
     search: undefined,
     /** @type {Array} */
     messageIds: [],
     /** @type {string} */
-    title: now,
+    title: datetime,
   };
 
-  container[now] = tmpObj
+  /** @type {object} */
+  container[now] = tmpObj;
 
-  // store().write(container);
-  const searchhInfoArray = config_util.format_search_info_for_sheet(container)
-
+  store().write(datetime, container)
 }
 
 // @todo finish this once the basic functions work (add/delete searches)
+/**
+ * @argument {object} searchInfoObject
+ * @return {object}
+ */
 function renameSavedSearch(searchInfoObject) {
   // update search name from default to user specified
   // this function only applies to names changed in the config sheet.
   // for names changed by manually updating the label, see savedSearches.gs
-
 }
 
 // @todo finish this once the basic functions work (add/delete searches)
+/**
+ * @argument {object} searchInfoObject
+ * @return {object}
+ */
 function removeSavedSearch(searchInfoObject) {
   // this function only removes searches from
 }
 
 class Config {
   constructor() {
-    sheetId = globalThis.configSheetId;
-    addNewSearch = addNewSavedSearch;
-    renameSearch = renameSavedSearch;
-    removeSearch = removeSavedSearch;
+    sheetId = globalThis.configSheetId
+    sheet = globalThis.spreadsheet
+    retrieveSearches = retrieveSavedSearches
+    addNewSearch = addNewSavedSearch
+    renameSearch = renameSavedSearch
+    removeSearch = removeSavedSearch
   }
 }
 
