@@ -20,9 +20,11 @@ function findNewOrDeletedSearches() {
   // every 5-10 seconds or so (5 seconds = 12 triggers, 
   // 10 seconds = 6 triggers)
 
-    /** @type {Array} */
-  let newlySaved = findNewSavedSearchMessages()
-  if (newlySaved) {
+    /** @type {object} */
+  let allLabels = findNewAdminLabels()
+
+  // @todo process save and delete here. 
+  if (allLabels.save) {
     for (var i = 0; i < newlySaved.length; i++) {
       // create searchinfo object
       // addNewSavedSearch(searchInfoObject)

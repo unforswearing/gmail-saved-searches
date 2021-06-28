@@ -99,7 +99,7 @@ function retrieveSavedSearches() {
 }
 
 /** @return {object} */
-function findNewSavedSearchMessages() {
+function findNewAdminLabels() {
 
   /** @return {Array} */
   const getThreadIds = (label) => {
@@ -115,13 +115,21 @@ function findNewSavedSearchMessages() {
 
   /** @type {Array} */
   let labels = GmalApp.getUserLabels()
-  let collector = []
+  let collector = { save: [], del: [] }
 
   for (let i = 0; i < labels.length; i++) {
     let l = labels[i]
+    let lname = l.getName()
 
-    if (l.getName() === 'save-search') {
-      collector.push({
+    if ( lname === 'save-search') {
+      collector.save.push({
+        datetime: now,
+        messageIds: getThreadIds(),
+        searchTerm: undefined,
+        title: datetime
+      })
+    } else if (lname === 'delete-search') {
+      collector.del.push({
         datetime: now,
         messageIds: getThreadIds(),
         searchTerm: undefined,
@@ -176,6 +184,11 @@ function addNewSavedSearch(searchInfoObject) {
   container[now] = tmpObj;
 
   store().write(datetime, container)
+}
+
+// @todo finish this
+function findNewDeletedSearchMessages() {
+
 }
 
 // @todo finish this once the basic functions work (add/delete searches)
